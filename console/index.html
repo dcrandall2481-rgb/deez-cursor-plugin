@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Deez Console — two-body kernel</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --panel: #10182a;
+      --ink: #e8eef9;
+      --muted: #8ea0bd;
+      --line: #24314a;
+      --accent: #38bdf8;
+      --gold: #fbbf24;
+      --ok: #34d399;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.45 ui-sans-serif, system-ui, sans-serif; }
+    body { min-height: 100vh; background-image:
+      radial-gradient(circle at 12% 8%, #1b2a4a 0, transparent 28%),
+      radial-gradient(circle at 88% 0%, #132033 0, transparent 24%); }
+    header { display: flex; gap: 16px; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--line); }
+    .mark { width: 48px; height: 48px; }
+    h1 { margin: 0; font-size: 20px; letter-spacing: 0.04em; }
+    header p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+    .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 16px 24px 28px; }
+    @media (max-width: 980px) { .wrap { grid-template-columns: 1fr; } }
+    section { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+    h2 { margin: 0 0 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); }
+    label { display: block; font-size: 12px; color: var(--muted); margin: 8px 0 4px; }
+    input, textarea, button {
+      width: 100%; border-radius: 8px; border: 1px solid var(--line);
+      background: #0b1220; color: var(--ink); padding: 8px 10px; font: inherit;
+    }
+    textarea { min-height: 88px; resize: vertical; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    button { cursor: pointer; background: #0e3a52; border-color: #1b5f80; font-weight: 600; }
+    pre { margin: 10px 0 0; background: #070c16; border: 1px solid var(--line); border-radius: 8px; padding: 10px; overflow: auto; font-size: 12px; color: #d7e6ff; }
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
+    .metric { background: #0b1220; border: 1px solid var(--line); border-radius: 8px; padding: 8px; }
+    .metric b { display: block; font-size: 16px; color: var(--gold); }
+    .metric span { color: var(--muted); font-size: 11px; }
+    .log { max-height: 280px; }
+    .note { color: var(--muted); font-size: 12px; margin-top: 8px; }
+    .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 11px; background: #132033; color: var(--accent); margin-left: 8px; }
+  </style>
+</head>
+<body>
+  <header>
+    <svg class="mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Deez">
+      <rect width="128" height="128" rx="24" fill="#0B1020"/>
+      <ellipse cx="64" cy="64" rx="46" ry="18" fill="none" stroke="#7DD3FC" stroke-width="3" transform="rotate(-18 64 64)"/>
+      <ellipse cx="64" cy="64" rx="46" ry="18" fill="none" stroke="#38BDF8" stroke-width="2" opacity="0.5" transform="rotate(28 64 64)"/>
+      <circle cx="64" cy="64" r="16" fill="#F8FAFC"/>
+      <text x="64" y="71" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="22" font-weight="700" fill="#0B1020">D</text>
+      <circle cx="104" cy="50" r="4" fill="#FBBF24"/>
+    </svg>
+    <div>
+      <h1>Deez Console <span class="pill">ideal two-body · live</span></h1>
+      <p>Same kernel as the Cursor plugin MCP. Not official SpaceX / NASA software. No drag, J2, or SGP4.</p>
+    </div>
+  </header>
+  <div class="wrap">
+    <section>
+      <h2>Circular orbit</h2>
+      <label>Altitude (km)</label>
+      <input id="circAlt" type="number" value="400" step="1" />
+      <button id="circBtn">Execute circular</button>
+      <div class="metrics">
+        <div class="metric"><b id="circPeriod">—</b><span>period (min)</span></div>
+        <div class="metric"><b id="circSpeed">—</b><span>speed (m/s)</span></div>
+        <div class="metric"><b id="circRadius">—</b><span>radius (km)</span></div>
+      </div>
+      <pre id="circOut">awaiting execute</pre>
+    </section>
+    <section>
+      <h2>Hohmann transfer</h2>
+      <div class="row">
+        <div>
+          <label>Start altitude (km)</label>
+          <input id="h1" type="number" value="400" step="1" />
+        </div>
+        <div>
+          <label>End altitude (km)</label>
+          <input id="h2" type="number" value="35786" step="1" />
+        </div>
+      </div>
+      <button id="hohBtn">Execute Hohmann</button>
+      <div class="metrics">
+        <div class="metric"><b id="dvTot">—</b><span>Δv total (m/s)</span></div>
+        <div class="metric"><b id="tof">—</b><span>time of flight (h)</span></div>
+        <div class="metric"><b id="dvSplit">—</b><span>Δv1 / Δv2 (m/s)</span></div>
+      </div>
+      <pre id="hohOut">awaiting execute</pre>
+    </section>
+    <section>
+      <h2>Unit audit + keyword gate</h2>
+      <textarea id="scanText">Burn 3.85 km/s then 7668.6 m/s at 400 km. ITAR memo mixed with unclassified cubesat ICD.</textarea>
+      <div class="row">
+        <button id="unitBtn">Run unit audit</button>
+        <button id="gateBtn">Run keyword gate</button>
+      </div>
+      <pre id="scanOut">awaiting execute</pre>
+    </section>
+    <section>
+      <h2>Execution log</h2>
+      <pre id="log" class="log"></pre>
+      <p class="note">MU_EARTH = 3.986004418e14 m³/s² · R_EARTH = 6378137 m (WGS-84 equatorial). Open this file locally; it runs in the browser with no server.</p>
+    </section>
+  </div>
+  <script>
+    const MU = 3.986004418e14;
+    const RE = 6378137.0;
+    const logEl = document.getElementById("log");
+    function stamp(msg, obj) {
+      logEl.textContent = "[" + new Date().toISOString() + "] " + msg + "\n" + JSON.stringify(obj, null, 2) + "\n\n" + logEl.textContent;
+    }
+    function circular(altKm) {
+      const r = RE + altKm * 1000;
+      const v = Math.sqrt(MU / r);
+      const p = 2 * Math.PI * Math.sqrt((r ** 3) / MU);
+      return { radius_m: r, altitude_m: altKm * 1000, period_s: p, period_min: p / 60, speed_m_s: v, mu_m3_s2: MU, model: "ideal two-body circular, spherical Earth" };
+    }
+    function hohmann(alt1Km, alt2Km) {
+      const r1 = RE + alt1Km * 1000;
+      const r2 = RE + alt2Km * 1000;
+      const a = 0.5 * (r1 + r2);
+      const v1 = Math.sqrt(MU / r1);
+      const v2 = Math.sqrt(MU / r2);
+      const vPeri = Math.sqrt(MU * (2 / r1 - 1 / a));
+      const vApo = Math.sqrt(MU * (2 / r2 - 1 / a));
+      const dv1 = Math.abs(vPeri - v1);
+      const dv2 = Math.abs(v2 - vApo);
+      const tof = Math.PI * Math.sqrt((a ** 3) / MU);
+      return { r1_m: r1, r2_m: r2, semi_major_transfer_m: a, v_circular_1_m_s: v1, v_circular_2_m_s: v2, delta_v_1_m_s: dv1, delta_v_2_m_s: dv2, delta_v_total_m_s: dv1 + dv2, time_of_flight_s: tof, time_of_flight_h: tof / 3600, mu_m3_s2: MU, model: "ideal two-body Hohmann, spherical Earth, no drag, no J2" };
+    }
+    function unitAudit(text) {
+      const pats = { km: /\b\d+(?:\.\d+)?\s*km\b/gi, m: /\b\d+(?:\.\d+)?\s*m\b/gi, deg: /\b\d+(?:\.\d+)?\s*deg(?:rees)?\b/gi, rad: /\b\d+(?:\.\d+)?\s*rad(?:ians)?\b/gi, "km/s": /\b\d+(?:\.\d+)?\s*km\/s\b/gi, "m/s": /\b\d+(?:\.\d+)?\s*m\/s\b/gi };
+      const counts = {};
+      for (const [k, re] of Object.entries(pats)) { const n = (text.match(re) || []).length; if (n) counts[k] = n; }
+      const warnings = [];
+      if (counts.km && counts.m) warnings.push("Text mixes km and m. Convert at one boundary and keep SI internally.");
+      if (counts.deg && counts.rad) warnings.push("Text mixes degrees and radians. Keep radians in kernels.");
+      if (counts["km/s"] && counts["m/s"]) warnings.push("Text mixes km/s and m/s.");
+      return { counts, warnings, ok: warnings.length === 0 };
+    }
+    function keywordGate(text) {
+      const flags = [[/\bitar\b/i, "Document mentions ITAR. Keep work local unless counsel says otherwise."], [/export administration regulation/i, "Document mentions EAR. Confirm classification before sending to a cloud agent."], [/\bear\s+controlled\b/i, "Document mentions EAR-controlled material. Confirm handling before a cloud agent."], [/\bclassified\b/i, "Classification language present. Do not send this file to a vendor cloud."], [/\bcmmc\b/i, "CMMC language present. Follow the program's handling rules."], [/export[\s-]?control/i, "Export-control language present."]];
+      const hits = [];
+      for (const [re, note] of flags) { if (re.test(text)) hits.push({ pattern: String(re), note }); }
+      return { hits, action: hits.length ? "keep_local" : "no_flag", disclaimer: "Heuristic only. Not legal advice. Does not detect actual controlled technical data." };
+    }
+    function fmt(n, d) { return Number(n).toFixed(d); }
+    function runCircular() {
+      const out = circular(Number(document.getElementById("circAlt").value));
+      document.getElementById("circPeriod").textContent = fmt(out.period_min, 2);
+      document.getElementById("circSpeed").textContent = fmt(out.speed_m_s, 1);
+      document.getElementById("circRadius").textContent = fmt(out.radius_m / 1000, 3);
+      document.getElementById("circOut").textContent = JSON.stringify(out, null, 2);
+      stamp("circular_orbit", out);
+    }
+    function runHohmann() {
+      const out = hohmann(Number(document.getElementById("h1").value), Number(document.getElementById("h2").value));
+      document.getElementById("dvTot").textContent = fmt(out.delta_v_total_m_s, 2);
+      document.getElementById("tof").textContent = fmt(out.time_of_flight_h, 2);
+      document.getElementById("dvSplit").textContent = fmt(out.delta_v_1_m_s, 1) + " / " + fmt(out.delta_v_2_m_s, 1);
+      document.getElementById("hohOut").textContent = JSON.stringify(out, null, 2);
+      stamp("hohmann_transfer", out);
+    }
+    document.getElementById("circBtn").onclick = runCircular;
+    document.getElementById("hohBtn").onclick = runHohmann;
+    document.getElementById("unitBtn").onclick = () => { const out = unitAudit(document.getElementById("scanText").value); document.getElementById("scanOut").textContent = JSON.stringify(out, null, 2); stamp("unit_audit", out); };
+    document.getElementById("gateBtn").onclick = () => { const out = keywordGate(document.getElementById("scanText").value); document.getElementById("scanOut").textContent = JSON.stringify(out, null, 2); stamp("keyword_gate", out); };
+    runCircular(); runHohmann();
+    document.getElementById("unitBtn").click();
+    document.getElementById("gateBtn").click();
+  </script>
+</body>
+</html>
