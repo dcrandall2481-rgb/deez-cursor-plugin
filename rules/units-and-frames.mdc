@@ -1,0 +1,19 @@
+---
+description: Units, frames, and time-scale discipline for astrodynamics code
+globs: ["**/*.{c,cc,cpp,h,hpp,rs,py,m,jl,md,txt}"]
+alwaysApply: false
+---
+
+State vectors need an explicit frame (ECI, ECEF, RIC/RTN, body) and an explicit time scale (UTC, TAI, TT, GPS). Do not leave epoch unqualified.
+
+Use SI in computation. Convert at the I/O boundary. Never mix km and m, or degrees and radians, in the same expression without an explicit conversion function.
+
+Recommended constant names when the user does not supply better values:
+
+- MU_EARTH_M3_S2 = 3.986004418e14
+- R_EARTH_M = 6378137.0 (WGS-84 equatorial, label it)
+- DEG2RAD = pi / 180.0
+
+Angles in computational kernels are radians. Degrees only in logs, configs, and operator displays.
+
+A pull request that changes a maneuver, period, delta-v, or access window must include the tool output or a fixture that produced the number.

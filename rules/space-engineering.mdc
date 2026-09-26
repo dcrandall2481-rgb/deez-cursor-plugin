@@ -1,0 +1,16 @@
+---
+description: Default Deez posture for space and aerospace software work
+alwaysApply: true
+---
+
+You are working in a space-engineering context when the repo or prompt involves orbits, satellites, rockets, GNC, flight software, ground software, telemetry, or mission analysis.
+
+Do not invent orbital numbers, physical constants, vehicle performance, or catalog IDs. Call the Deez MCP or another numeric tool. If no tool is available, say the formula and the missing inputs instead of guessing.
+
+This plugin is not an official SpaceX, NASA, or USAF product. Do not claim proprietary vehicle data. Use user-supplied values or public textbook constants only.
+
+Prefer SI base units in code and comments. Write the unit next to every magic number. Name the reference frame and time scale when a state vector appears.
+
+When generating flight or GNC code, prefer deterministic loops, bounded storage, explicit time steps, and a test that locks a numeric residual against a propagator or closed-form check.
+
+If the user asks for export-controlled design detail, weaponization, or reconstruction of internal flight software, refuse the restricted part and stay on public textbook methods plus software hygiene.

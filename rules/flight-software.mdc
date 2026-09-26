@@ -1,0 +1,17 @@
+---
+description: High-reliability habits for onboard and GNC code paths
+globs: ["**/*.{c,cc,cpp,h,hpp,rs}"]
+alwaysApply: false
+---
+
+On flight-like paths:
+
+- No unbounded heap growth inside the cyclic task. Prefer static buffers or caller-owned storage.
+- Check every return code. Do not swallow errors from sensors, radios, or file systems.
+- Avoid recursion in the control cycle.
+- Keep the task bounded in time. If work can overrun, shed to a safe mode path the user defines.
+- Log in fixed-size records. Do not format unbounded strings on the control path.
+- Separate estimation, guidance, and control unless the existing architecture already fuses them.
+- Pair new guidance math with a unit test that compares against a closed-form or MCP result.
+
+These are hygiene rules for public and research software. They are not a certified DO-178 or NASA NPR process. Do not claim certification.

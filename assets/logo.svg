@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Deez">
+  <rect width="128" height="128" rx="24" fill="#0B1020"/>
+  <ellipse cx="64" cy="64" rx="46" ry="18" fill="none" stroke="#7DD3FC" stroke-width="3" transform="rotate(-18 64 64)"/>
+  <ellipse cx="64" cy="64" rx="46" ry="18" fill="none" stroke="#38BDF8" stroke-width="2" opacity="0.5" transform="rotate(28 64 64)"/>
+  <circle cx="64" cy="64" r="16" fill="#F8FAFC"/>
+  <text x="64" y="71" text-anchor="middle" font-family="ui-sans-serif, system-ui, sans-serif" font-size="22" font-weight="700" fill="#0B1020">D</text>
+  <circle cx="104" cy="50" r="4" fill="#FBBF24"/>
+</svg>
