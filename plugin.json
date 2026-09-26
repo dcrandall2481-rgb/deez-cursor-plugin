@@ -1,0 +1,10 @@
+{
+  "name": "deez",
+  "version": "0.1.0",
+  "description": "Space-engineering agent plugin. Rules, skills, and a local two-body MCP for verified orbital numbers.",
+  "author": {
+    "name": "DJDEEZ"
+  },
+  "license": "MIT",
+  "keywords": ["aerospace", "astrodynamics", "gnc", "flight-software"]
+}

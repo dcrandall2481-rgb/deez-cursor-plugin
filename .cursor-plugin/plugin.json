@@ -1,0 +1,25 @@
+{
+  "name": "deez",
+  "displayName": "Deez",
+  "version": "0.1.0",
+  "description": "Space-engineering plugin for Cursor. Units and frames discipline, high-reliability flight-software rules, orbit-check skills, and a local MCP that computes textbook two-body numbers instead of letting the model invent them.",
+  "author": {
+    "name": "DJDEEZ",
+    "email": "dcrandall2481-rgb@users.noreply.github.com"
+  },
+  "homepage": "https://github.com/dcrandall2481-rgb/deez-cursor-plugin",
+  "repository": "https://github.com/dcrandall2481-rgb/deez-cursor-plugin",
+  "license": "MIT",
+  "keywords": [
+    "aerospace",
+    "astrodynamics",
+    "gnc",
+    "flight-software",
+    "cubesat",
+    "orbit",
+    "cfs",
+    "units",
+    "reliability"
+  ],
+  "logo": "assets/logo.svg"
+}
